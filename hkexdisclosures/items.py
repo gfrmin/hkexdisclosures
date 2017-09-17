@@ -19,8 +19,9 @@ class notice(scrapy.Item):
     formType = scrapy.Field()
     nameOfListedCorporation = scrapy.Field()
     name = scrapy.Field()
-    directorLastName = scrapy.Field()
-    directorFirstName = scrapy.Field()
+    surname = scrapy.Field()
+    othernames = scrapy.Field()
+    numberofissuedshares = scrapy.Field()
     
     longpositionbefore = scrapy.Field()
     shortpositionbefore = scrapy.Field()
