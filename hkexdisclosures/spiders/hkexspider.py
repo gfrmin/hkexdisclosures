@@ -44,6 +44,7 @@ class HkexspiderSpider(scrapy.Spider):
         newnotice['surname'] = response.css("#lblDSurname::text").extract_first()
         newnotice['othernames'] = response.css("#lblDFirstname::text").extract_first()
         newnotice['numberofissuedshares'] = response.css("#lblDIssued::text").extract_first()
+        newnotice['formDate'] = response.css("#lblDSignDate::text").extract_first()
        
         beforerowdict = {}
         for beforerow in response.css("#grdSh_BEvt tr")[1:]:

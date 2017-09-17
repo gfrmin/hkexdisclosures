@@ -22,6 +22,7 @@ class notice(scrapy.Item):
     surname = scrapy.Field()
     othernames = scrapy.Field()
     numberofissuedshares = scrapy.Field()
+    formDate = scrapy.Field()
     
     longpositionbefore = scrapy.Field()
     shortpositionbefore = scrapy.Field()
