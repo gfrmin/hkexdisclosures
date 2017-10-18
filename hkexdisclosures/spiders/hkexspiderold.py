@@ -124,7 +124,7 @@ class HkexspiderSpiderOld(scrapy.Spider):
             item['after'] = {'number': response.css("#lblDAEvtAmount").extract_first()}
         else:
             item['before'] = []
-            for tr in response.css("#grdSh_BEvt").css("tr"):
+            for tr in response.css("#grdSh_BEvt").css("tr")[1:]:
                 positionbefore = tr.css("td::text").extract()
                 item['before'].append(
                     {
@@ -135,7 +135,7 @@ class HkexspiderSpiderOld(scrapy.Spider):
                 )
 
             item['after'] = []
-            for tr in response.css("#grdSh_AEvt").css("tr"):
+            for tr in response.css("#grdSh_AEvt").css("tr")[1:]:
                 positionafter = tr.css("td::text").extract()
                 item['after'].append(
                     {
