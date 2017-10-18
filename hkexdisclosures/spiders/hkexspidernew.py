@@ -128,9 +128,9 @@ class HkexspiderSpiderNew(scrapy.Spider):
                 positionafter = tr.css("td::text").extract()
                 item['after'].update(
                     {
-                        'position': positionbefore[0],
-                        'number': positionbefore[1],
-                        'percent': positionbefore[2]
+                        'position': positionafter[0],
+                        'number': positionafter[1],
+                        'percent': positionafter[2]
                     }
                 )
 
