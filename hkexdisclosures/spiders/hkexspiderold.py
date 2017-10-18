@@ -2,8 +2,8 @@
 import scrapy
 from hkexdisclosures.items import TransactionNotice
 
-class HkexspiderSpiderOld(scrapy.Spider):
-    name = "hkexspiderold"
+class HkexspiderSpiderOld2(scrapy.Spider):
+    name = "hkexspiderold2"
     allowed_domains = ["sdinotice.hkex.com.hk", "www.hkexnews.hk"]
     start_urls = ['http://www.hkexnews.hk/listedco/listconews/advancedsearch/stocklist_active_main.htm']
 
