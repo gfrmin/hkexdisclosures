@@ -7,26 +7,75 @@
 
 import scrapy
 
-
-class notice(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
+class TransactionNotice(scrapy.Item):
+    # magic fields
+    timestamp = scrapy.Field()
     url = scrapy.Field()
-    formID = scrapy.Field()
-    StockCode = scrapy.Field()
-    DateSSaware = scrapy.Field()
-    eventDate = scrapy.Field()
-    formType = scrapy.Field()
-    nameOfListedCorporation = scrapy.Field()
-    name = scrapy.Field()
+    
+    # main details 
+    formtype = scrapy.Field()
+    formserialnumber = scrapy.Field()
+
+    corporation = scrapy.Field()
+    stock_code = scrapy.Field()
+    assetclass = scrapy.Field()
+    number_issued = scrapy.Field()
+
     surname = scrapy.Field()
     othernames = scrapy.Field()
-    numberofissuedshares = scrapy.Field()
-    formDate = scrapy.Field()
+    chinesename = scrapy.Field()
+    chinesecharactercode = scrapy.Field()
+
+    name = scrapy.Field()
+    registeredoffice = scrapy.Field()
+    principalplace = scrapy.Field()
+    listedexchange = scrapy.Field()
+    parentdetails = scrapy.Field()
+
+    associatedcorporation = scrapy.Field()
+    brnumber = scrapy.Field()
+    certincorpnumber = scrapy.Field()
+    placeincorp = scrapy.Field()
+
+    date = scrapy.Field()
+    dateaware = scrapy.Field()
+
+    # event details
     
-    longpositionbefore = scrapy.Field()
-    shortpositionbefore = scrapy.Field()
-    lendingpoolbefore = scrapy.Field()    
-    longpositionafter = scrapy.Field()
-    shortpositionafter = scrapy.Field()
-    lendingpoolafter = scrapy.Field()    
+    relevanteventdetails = scrapy.Field()
+
+    before = scrapy.Field()
+    after = scrapy.Field()
+
+    capacityheld = scrapy.Field()
+
+    # further information
+    
+    derivativeinterests = scrapy.Field()
+
+    dependentinformation = scrapy.Field()
+
+    othercorporationinterests = scrapy.Field()
+
+    jointinterests = scrapy.Field()
+
+    trustinterests = scrapy.Field()
+
+    s317info = scrapy.Field()
+    s317total = scrapy.Field()
+
+    accordancepersons = scrapy.Field()
+
+    debenturerights = scrapy.Field()
+    
+
+    # final details
+
+    dateformfilled = scrapy.Field()
+
+    numberofattachments = scrapy.Field()
+
+    
+
+
+

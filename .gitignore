@@ -1,0 +1,9 @@
+.Rproj.user/
+*.Rproj
+*.R
+*.pyc
+*.jl
+*.*~
+*#
+*.csv
+.Rproj.user
