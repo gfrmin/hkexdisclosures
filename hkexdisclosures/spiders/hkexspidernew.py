@@ -5,24 +5,12 @@ import datetime
 
 class HkexspiderSpiderNew(scrapy.Spider):
     name = "hkexspidernew"
-    allowed_domains = ["sdinotice.hkex.com.hk", "www.hkexnews.hk"]
-    start_urls = ['http://www.hkexnews.hk/listedco/listconews/advancedsearch/stocklist_active_main.htm']
+    allowed_domains = ["sdinotice.hkex.com.hk"]
+
+    todaysdate = datetime.date.today().strftime("%d/%m/%Y")
+    start_urls = ['http://sdinotice.hkex.com.hk/di/NSAllFormDateList.aspx?sa1=da&scsd=01/04/2003&sced='+todaysdate+'&src=MAIN&lang=EN']
 
     def parse(self, response):
-        todaysdate = datetime.date.today().strftime("%d/%m/%Y")
-        stockcodes = response.css(".TableContentStyle1 td:nth-child(1)::text , .TableContentStyle2 td:nth-child(1)::text").extract()
-        stockurls = ['http://sdinotice.hkex.com.hk/di/NSSrchCorpList.aspx?sa1=cl&scsd=03/07/2017&sced='+todaysdate+'&sc='+sc+'&src=MAIN&lang=EN' for sc in stockcodes]
-        for stockurl in stockurls:
-            yield scrapy.Request(stockurl, callback = self.parse_searchresults)
-    
-    def parse_searchresults(self, response):
-        try:
-            for linkurl in response.css("a:nth-child(11)::attr(href)").extract():
-                yield scrapy.Request(response.urljoin(linkurl), callback = self.parse_notices)
-        except Error as e:
-            pass
-
-    def parse_notices(self, response):
         try:
             for linkurl in response.css("#grdPaging .tbCell:nth-child(1) a::attr(href)").extract():
                 yield scrapy.Request(response.urljoin(linkurl), callback = self.parse_notice)
@@ -30,7 +18,7 @@ class HkexspiderSpiderNew(scrapy.Spider):
             pass
         else:
             for pageurl in response.css("#lblPageIndex a::attr(href)").extract():
-                yield scrapy.Request(response.urljoin(pageurl), callback = self.parse_notices)
+                yield scrapy.Request(response.urljoin(pageurl), callback = self.parse)
         
     def parse_notice(self, response):
         def extractminitable(classidcoderows, desc="Number of shares"):
@@ -62,7 +50,7 @@ class HkexspiderSpiderNew(scrapy.Spider):
                         [tablerowtds[x].css("::text").extract_first() for x in range(tablecolsnumber)]
                     ))
                 field.append(tablerowdict)
-            return field
+            return field        
         
         item = TransactionNotice()
 
@@ -100,9 +88,9 @@ class HkexspiderSpiderNew(scrapy.Spider):
         item['relevanteventdetails'] = {
             'Position 1': {
                 'Position': response.css("#lblDEvtPosition::text").extract_first(),
-                'Event code': response.css("#lblDEvtReason::text").extract_first(),
-                'Code before relevant event': response.css("#lblDEvtCapBefore::text").extract_first(),
-                'Code after relevant event': response.css("#lblDEvtCapAfter::text").extract_first(),
+                'Event code': response.css("#lblDEvtReason td::text").extract_first(),
+                'Code before relevant event': response.css("#lblDEvtCapBefore td::text").extract_first(),
+                'Code after relevant event': response.css("#lblDEvtCapAfter td::text").extract_first(),
                 'Number of shares': response.css("#lblDEvtShare::text").extract_first(),
                 'Amount of debentures': response.css("#lblDEvtAmount::text").extract_first(),
                 'Currency': response.css("#lblDEvtCurrency::text").extract_first(),
@@ -110,13 +98,13 @@ class HkexspiderSpiderNew(scrapy.Spider):
                 'Highest price on exchange': response.css("#lblDEvtHPrice::text").extract_first(),
                 'Average price on exchange': response.css("#lblDEvtAPrice::text").extract_first(),
                 'Average consideration off exchange': response.css("#lblDEvtAConsider::text").extract_first(),
-                'Consideration code': response.css("#lblDEvtNatConsider::text").extract_first()
+                'Consideration code': response.css("#lblDEvtNatConsider td::text").extract_first()
             },
             'Position 2': {
                 'Position': response.css("#lblDEvtPosition2::text").extract_first(),
-                'Event code': response.css("#lblDEvtReason2::text").extract_first(),
-                'Code before relevant event': response.css("#lblDEvtCapBefore2::text").extract_first(),
-                'Code after relevant event': response.css("#lblDEvtCapAfter2::text").extract_first(),
+                'Event code': response.css("#lblDEvtReason2 td::text").extract_first(),
+                'Code before relevant event': response.css("#lblDEvtCapBefore2 td::text").extract_first(),
+                'Code after relevant event': response.css("#lblDEvtCapAfter2 td::text").extract_first(),
                 'Number of shares': response.css("#lblDEvtShare2::text").extract_first()
             }
         }
@@ -135,7 +123,6 @@ class HkexspiderSpiderNew(scrapy.Spider):
                         'percent': positionbefore[2]
                     }
                 )
-
             item['after'] = {}
             for tr in response.css("#grdSh_AEvt").css("tr"):
                 positionafter = tr.css("td::text").extract()
@@ -147,7 +134,7 @@ class HkexspiderSpiderNew(scrapy.Spider):
                     }
                 )
 
-        item['capacityheld'] = extractformtable('"grdCap_SS"', True)
+        item['capacityheld'] = extractformtabletd('"grdCap_SS"', True)
 
         # further information
 
