@@ -94,5 +94,5 @@ MAGIC_FIELDS = {
     "url": "$response:url"
 }
 
-FEED_URI = 's3://hkdata/hkexdisclosures/%(name)s/%(time)s.csv'
-FEED_FORMAT = 'csv'
+FEED_URI = 's3://hkdata/hkexdisclosures/%(name)s/%(time)s.jl'
+FEED_FORMAT = 'jsonlines'
