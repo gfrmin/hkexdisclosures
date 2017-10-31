@@ -75,7 +75,10 @@ class TransactionNotice(scrapy.Item):
 
     numberofattachments = scrapy.Field()
 
-    
+    supplementaryinfo = scrapy.Field()
+
+    previousserialnumber = scrapy.Field()
+
 
 
 

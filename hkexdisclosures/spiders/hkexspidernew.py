@@ -28,12 +28,15 @@ class HkexspiderSpiderNew(scrapy.Spider):
                 classidcoderowdict.update({classidcoderowtds[0]: classidcoderowtds[1]})
             return {desc: classidcoderowdict}
     
-        def extractformtable(tableid, minitablep):
+        def extractformtable(tableid, minitablep, s317p = False):
             field = []
             table = response.xpath('//*[(@id = ' + tableid + ')]/tr')
             if not table: return []
             tablecols = table[0].css("td::text").extract()
-            tablerows = table[1:]
+            if s317p:
+                tablerows = table[1:-1]
+            else:
+                tablerows = table[1:]
             tablecolsnumber = len(tablecols)
             for tablerow in tablerows:
                 tablerowtds = tablerow.xpath("td")
@@ -41,16 +44,16 @@ class HkexspiderSpiderNew(scrapy.Spider):
                     minitable = extractminitable(tablerowtds[tablecolsnumber - 1].xpath("table/tr"))
                     tablerowdict = dict(zip(
                         tablecols,
-                        [tablerowtds[x].css("::text").extract_first() for x in range(tablecolsnumber - 1)]
+                        [tablerowtds[x].css("::text").extract() for x in range(tablecolsnumber - 1)]
                     ))
                     tablerowdict.update(minitable)
                 else:
                     tablerowdict = dict(zip(
                         tablecols,
-                        [tablerowtds[x].css("::text").extract_first() for x in range(tablecolsnumber)]
+                        [tablerowtds[x].css("::text").extract() for x in range(tablecolsnumber)]
                     ))
                 field.append(tablerowdict)
-            return field        
+            return field         
         
         item = TransactionNotice()
 
@@ -88,9 +91,9 @@ class HkexspiderSpiderNew(scrapy.Spider):
         item['relevanteventdetails'] = {
             'Position 1': {
                 'Position': response.css("#lblDEvtPosition::text").extract_first(),
-                'Event code': response.css("#lblDEvtReason td::text").extract_first(),
-                'Code before relevant event': response.css("#lblDEvtCapBefore td::text").extract_first(),
-                'Code after relevant event': response.css("#lblDEvtCapAfter td::text").extract_first(),
+                'Event code': response.css("#lblDEvtReason td::text").extract(),
+                'Code before relevant event': response.css("#lblDEvtCapBefore td::text").extract(),
+                'Code after relevant event': response.css("#lblDEvtCapAfter td::text").extract(),
                 'Number of shares': response.css("#lblDEvtShare::text").extract_first(),
                 'Amount of debentures': response.css("#lblDEvtAmount::text").extract_first(),
                 'Currency': response.css("#lblDEvtCurrency::text").extract_first(),
@@ -98,13 +101,13 @@ class HkexspiderSpiderNew(scrapy.Spider):
                 'Highest price on exchange': response.css("#lblDEvtHPrice::text").extract_first(),
                 'Average price on exchange': response.css("#lblDEvtAPrice::text").extract_first(),
                 'Average consideration off exchange': response.css("#lblDEvtAConsider::text").extract_first(),
-                'Consideration code': response.css("#lblDEvtNatConsider td::text").extract_first()
+                'Consideration code': response.css("#lblDEvtNatConsider td::text").extract()
             },
             'Position 2': {
                 'Position': response.css("#lblDEvtPosition2::text").extract_first(),
-                'Event code': response.css("#lblDEvtReason2 td::text").extract_first(),
-                'Code before relevant event': response.css("#lblDEvtCapBefore2 td::text").extract_first(),
-                'Code after relevant event': response.css("#lblDEvtCapAfter2 td::text").extract_first(),
+                'Event code': response.css("#lblDEvtReason2 td::text").extract(),
+                'Code before relevant event': response.css("#lblDEvtCapBefore2 td::text").extract(),
+                'Code after relevant event': response.css("#lblDEvtCapAfter2 td::text").extract(),
                 'Number of shares': response.css("#lblDEvtShare2::text").extract_first()
             }
         }
@@ -113,20 +116,21 @@ class HkexspiderSpiderNew(scrapy.Spider):
             item['before'] = {'number': response.css("#lblDBEvtAmount").extract_first()}
             item['after'] = {'number': response.css("#lblDAEvtAmount").extract_first()}
         else:
-            item['before'] = {}
-            for tr in response.css("#grdSh_BEvt").css("tr"):
+            item['before'] = []
+            for tr in response.css("#grdSh_BEvt").css("tr")[1:]:
                 positionbefore = tr.css("td::text").extract()
-                item['before'].update(
+                item['before'].append(
                     {
                         'position': positionbefore[0],
                         'number': positionbefore[1],
                         'percent': positionbefore[2]
                     }
                 )
-            item['after'] = {}
-            for tr in response.css("#grdSh_AEvt").css("tr"):
+
+            item['after'] = []
+            for tr in response.css("#grdSh_AEvt").css("tr")[1:]:
                 positionafter = tr.css("td::text").extract()
-                item['after'].update(
+                item['after'].append(
                     {
                         'position': positionafter[0],
                         'number': positionafter[1],
@@ -134,7 +138,7 @@ class HkexspiderSpiderNew(scrapy.Spider):
                     }
                 )
 
-        item['capacityheld'] = extractformtabletd('"grdCap_SS"', True)
+        item['capacityheld'] = extractformtable('"grdCap_SS"', True)
 
         # further information
 
@@ -148,9 +152,9 @@ class HkexspiderSpiderNew(scrapy.Spider):
 
         item['trustinterests'] = extractformtable('"grdTrust_Sh"', True)
 
-        item['s317info'] = extractformtable('"grdPA_Sh"', False)
+        item['s317info'] = extractformtable('"grdPA_Sh"', True, True)
 
-        item['s317total'] = response.css("#lblDPATotalShare::text").extract_first()
+        item['s317total'] = response.css("#grdPA_Sh tr")[-1].css("td")[-1].css("::text").extract_first()
 
         item['accordancepersons'] = extractformtable('"grdPer_CorpRel"', True)
 
@@ -161,5 +165,9 @@ class HkexspiderSpiderNew(scrapy.Spider):
         item['dateformfilled'] = response.css("#lblDSignDate::text").extract_first()
 
         item['numberofattachments'] = response.css("#lblDNoAttachment::text").extract_first()
+
+        item['supplementaryinfo'] = response.css("#lblDSuppInfo::text").extract_first()
+
+        item['previousserialnumber'] = response.css("#lblDRevisePrevSN::text").extract_first()
         
         yield item
