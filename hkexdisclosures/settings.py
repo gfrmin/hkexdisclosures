@@ -94,5 +94,7 @@ MAGIC_FIELDS = {
     "url": "$response:url"
 }
 
+DUPEFILTER_CLASS = 'hkexdisclosures.dupefilter.FormIDFilter'
+
 FEED_URI = 's3://hkdata/hkexdisclosures/%(name)s/%(time)s.jl'
 FEED_FORMAT = 'jsonlines'
