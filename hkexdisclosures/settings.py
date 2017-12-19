@@ -89,12 +89,12 @@ ROBOTSTXT_OBEY = True
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
+DELTAFETCH_ENABLED = True
+
 MAGIC_FIELDS = {
     "timestamp": "$time",
     "url": "$response:url"
 }
-
-DUPEFILTER_CLASS = 'hkexdisclosures.dupefilter.FormIDFilter'
 
 FEED_URI = 's3://hkdata/hkexdisclosures/%(name)s/%(time)s.jl'
 FEED_FORMAT = 'jsonlines'

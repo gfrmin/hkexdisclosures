@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from hkexdisclosures.items import TransactionNotice
+import re
 
 class HkexspiderSpiderOld(scrapy.Spider):
     name = "hkexspiderold"
@@ -23,7 +24,7 @@ class HkexspiderSpiderOld(scrapy.Spider):
     def parse_notices(self, response):
         try:
             for linkurl in response.css("#grdPaging .tbCell:nth-child(1) a::attr(href)").extract():
-                yield scrapy.Request(response.urljoin(linkurl), callback = self.parse_notice)
+                yield scrapy.Request(response.urljoin(linkurl), callback = self.parse_notice, meta = {'deltafetch_key': re.search(r'(NSForm.+\.aspx\?fn=.+?)&', linkurl).group(1)})
         except Error as e:
             pass
         else:
