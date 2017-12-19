@@ -112,15 +112,20 @@ class HkexspiderSpiderOld(scrapy.Spider):
                 'Average price on exchange': response.css("#lblDEvtAPrice::text").extract_first(),
                 'Average consideration off exchange': response.css("#lblDEvtAConsider::text").extract_first(),
                 'Consideration code': response.css("#lblDEvtNatConsider::text").extract_first()
-            },
-            'Position 2': {
-                'Position': response.css("#lblDEvtPosition2::text").extract_first(),
-                'Event code': response.css("#lblDEvtReason2")[0].css("::text").extract(),
-                'Code before relevant event': response.css("#lblDEvtCapBefore2")[0].css("::text").extract(),
-                'Code after relevant event': response.css("#lblDEvtCapAfter2")[0].css("::text").extract(),
-                'Number of shares': response.css("#lblDEvtShare2::text").extract_first()
             }
         }
+        if response.css("#lblDEvtReason2"):
+            item['relevanteventdetails'].update(
+                {
+                    'Position 2': {
+                        'Position': response.css("#lblDEvtPosition2::text").extract_first(),
+                        'Event code': response.css("#lblDEvtReason2")[0].css("::text").extract(),
+                        'Code before relevant event': response.css("#lblDEvtCapBefore2")[0].css("::text").extract(),
+                        'Code after relevant event': response.css("#lblDEvtCapAfter2")[0].css("::text").extract(),
+                        'Number of shares': response.css("#lblDEvtShare2::text").extract_first()
+                    }
+                }
+            )
 
         if response.css("#lblDBEvtAmount").extract_first() is not None:
             item['before'] = {'number': response.css("#lblDBEvtAmount").extract_first()}
